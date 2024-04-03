@@ -56,6 +56,18 @@ local_manifests = '.repo/local_manifests'
 if not os.path.exists(local_manifests):
     os.makedirs(local_manifests)
 
+if not depsonly:
+    githubreq = urllib.request.Request("https://raw.githubusercontent.com/LineageOS/mirror/main/default.xml")
+    try:
+        result = ElementTree.fromstring(urllib.request.urlopen(githubreq).read().decode())
+    except urllib.error.URLError:
+        print("Failed to fetch data from GitHub")
+        sys.exit(1)
+    except ValueError:
+        print("Failed to parse return data from GitHub")
+        sys.exit(1)
+    for res in result.findall('.//project'):
+        repositories.append(res.attrib['name'][10:])
 
 def debug(*args, **kwargs):
     if DEBUG:
